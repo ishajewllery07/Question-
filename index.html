@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Question Paper Studio Pro</title>
+<style>
+:root{
+  --pc:#1e40af;
+  --pl:#eff6ff;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --tx:#0f172a;
+  --muted:#64748b;
+  --bd:#e2e8f0;
+  --sidebar-bg:#0f172a;
+  --sidebar-hover:#1e293b;
+  --sidebar-active:#1e293b;
+  --sidebar-tx:#94a3b8;
+  --sidebar-active-tx:#ffffff;
+  --success:#16a34a;
+  --danger:#dc2626;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-size:14px;overflow-x:hidden;}
+
+/* Top App Bar */
+.app-header{
+  background:#fff;border-bottom:1px solid var(--bd);padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.menu-btn{
+  width:40px;height:40px;border-radius:8px;border:1px solid var(--bd);
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:18px;color:#1e293b;
+}
+.page-title h1{font-size:15px;font-weight:700;color:#0f172a;line-height:1.2;}
+.page-title p{font-size:11px;color:var(--muted);margin-top:1px;}
+.avatar-badge{
+  width:36px;height:36px;border-radius:50%;background:#e0e7ff;
+  color:#3730a3;font-weight:700;font-size:13px;display:flex;
+  align-items:center;justify-content:center;
+}
+
+/* Sidebar Drawer Overlay */
+.drawer-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);
+  z-index:998;opacity:0;pointer-events:none;transition:opacity 0.25s ease;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+
+/* Sidebar Drawer */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--sidebar-bg);
+  color:#fff;z-index:999;transform:translateX(-100%);transition:transform 0.25s ease;
+  display:flex;flex-direction:column;justify-content:space-between;padding:16px 12px;
+}
+.sidebar.open{transform:translateX(0);}
+
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:8px 8px 16px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sidebar-logo{
+  width:36px;height:36px;border-radius:8px;background:#d97706;color:#fff;
+  font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;
+}
+.sidebar-title{font-size:14px;font-weight:700;color:#fff;line-height:1.2;}
+.sidebar-subtitle{font-size:11px;color:#94a3b8;}
+
+.sidebar-section-label{font-size:10px;font-weight:700;letter-spacing:1px;color:#64748b;margin:18px 8px 6px;text-transform:uppercase;}
+.sidebar-nav{display:flex;flex-direction:column;gap:3px;}
+.sidebar-item{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;
+  color:var(--sidebar-tx);text-decoration:none;font-weight:600;font-size:13px;
+  cursor:pointer;border:none;background:none;width:100%;text-align:left;
+}
+.sidebar-item:hover{background:var(--sidebar-hover);color:#fff;}
+.sidebar-item.active{background:var(--sidebar-active);color:var(--sidebar-active-tx);}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center;}
+
+.sidebar-footer{padding:10px 8px;font-size:10.5px;color:#64748b;border-top:1px solid rgba(255,255,255,0.08);}
+
+/* App Content Area */
+.app-container{max-width:960px;margin:0 auto;padding:16px 12px 60px;}
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* Dashboard Specific UI (Screenshots 2 & 3) */
+.dash-hero{margin-bottom:16px;}
+.dash-hero h2{font-size:20px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px;}
+.dash-hero p{font-size:13px;color:var(--muted);margin-top:2px;}
+
+.dash-hero-actions{display:flex;gap:8px;margin-top:12px;}
+.btn-solid-blue{
+  background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 16px;
+  font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+}
+.btn-soft-blue{
+  background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;
+  font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.metric-card{
+  background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px;
+  display:flex;flex-direction:column;justify-content:space-between;min-height:92px;position:relative;
+}
+.metric-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.metric-label{font-size:12px;color:var(--muted);font-weight:600;}
+.metric-icon{
+  width:32px;height:32px;border-radius:8px;background:#f1f5f9;
+  display:flex;align-items:center;justify-content:center;color:#475569;font-size:14px;
+}
+.metric-val{font-size:24px;font-weight:800;color:#0f172a;margin-top:4px;line-height:1.1;}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.section-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px;}
+.section-card-title{font-size:14px;font-weight:700;color:#0f172a;}
+.section-card-sub{font-size:11.5px;color:var(--muted);margin-top:2px;margin-bottom:12px;}
+
+/* Quick Actions List */
+.quick-action-item{
+  display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--bd);
+  border-radius:10px;margin-bottom:8px;cursor:pointer;background:#fff;
+}
+.quick-action-item:last-child{margin-bottom:0;}
+.quick-action-icon{
+  width:40px;height:40px;border-radius:8px;background:#f8fafc;border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.quick-action-title{font-size:13px;font-weight:700;color:#0f172a;}
+.quick-action-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* Empty State */
+.empty-box{text-align:center;padding:24px 12px;}
+.empty-icon{font-size:36px;color:#94a3b8;margin-bottom:8px;}
+.empty-title{font-size:13px;font-weight:700;color:#0f172a;}
+.empty-sub{font-size:11.5px;color:var(--muted);margin-top:2px;margin-bottom:12px;}
+
+/* Workflow steps */
+.step-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px;}
+.step-item{background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);}
+.step-num{font-size:12px;font-weight:800;color:#2563eb;}
+.step-title{font-size:13px;font-weight:700;color:#0f172a;margin-top:2px;}
+.step-desc{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* Forms & Editor Layout */
+label{display:block;font-size:11.5px;font-weight:600;color:#475569;margin:8px 0 3px;}
+input,select,textarea{
+  width:100%;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;
+  font-size:13px;color:inherit;background:#fff;
+}
+textarea{min-height:75px;resize:vertical;}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.row-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+@media(max-width:640px){.row-2,.row-3,.row-4{grid-template-columns:1fr;}}
+
+.btn{
+  border:none;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600;
+  cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+}
+.btn-primary{background:var(--pc);color:#fff;}
+.btn-save{background:#d97706;color:#fff;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-outline{background:transparent;border:1px solid var(--bd);color:inherit;}
+
+/* Question Card */
+.q-card{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--pc);border-radius:8px;padding:12px;margin-bottom:12px;}
+.sub-items{background:#f8fafc;border:1px dashed var(--bd);border-radius:6px;padding:8px;margin-top:8px;}
+.sub-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;background:#fff;padding:6px;border-radius:6px;border:1px solid var(--bd);flex-wrap:wrap;}
+.sub-row input[type="text"]{flex:1;min-width:140px;}
+.img-btn{position:relative;overflow:hidden;cursor:pointer;}
+.img-btn input[type="file"]{position:absolute;left:0;top:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.thumb{width:38px;height:38px;border-radius:4px;object-fit:contain;border:1px solid var(--bd);background:#fff;}
+.q-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid var(--bd);padding-top:6px;}
+
+/* A4 Sheet Preview */
+#paper-wrap{background:#64748b;padding:15px 5px;overflow-x:auto;}
+#paper{
+  width:100%;max-width:780px;min-height:1050px;padding:24px 28px 16px;background:#fff;
+  margin:0 auto;box-sizing:border-box;color:#111;font-size:13px;
+  -webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;
+  display:flex;flex-direction:column;
+}
+#paper-content{flex:1;}
+.p-hd{border:2px solid var(--pc);border-radius:6px;overflow:hidden;margin-bottom:10px;}
+.p-hd-top{display:flex;align-items:center;background:var(--pc);color:#fff;padding:8px 12px;}
+.p-logo{width:52px;height:52px;object-fit:contain;margin-right:12px;background:#fff;border-radius:4px;padding:2px;}
+.p-titles{flex:1;text-align:center;}
+.p-sch{font-size:18px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;font-family:Georgia,serif;}
+.p-exm{font-size:12px;font-weight:700;margin-top:2px;}
+.p-meta{background:var(--pl);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;padding:5px 12px;font-weight:700;font-size:12px;border-top:1px solid var(--pc);border-bottom:1px solid var(--pc);}
+.p-inst{padding:4px 12px;font-size:11px;font-style:italic;background:#fff;border-bottom:1px dashed #cbd5e0;}
+.p-stu{display:flex;gap:8px;align-items:center;padding:5px 12px;font-size:12px;font-weight:600;background:#fff;}
+.p-dot{flex:1;border-bottom:1px dotted #444;height:12px;}
+
+.p-q{border:1.2px solid var(--pc);border-radius:6px;overflow:hidden;margin-bottom:10px;page-break-inside:avoid;break-inside:avoid;}
+.p-qh{background:var(--pl);border-bottom:1px solid var(--pc);padding:5px 10px;font-weight:700;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;}
+.p-marks-badge{font-size:12px;font-weight:700;color:var(--pc);}
+.p-qb{padding:8px 12px;background:#fff;}
+
+.p-mtbl{width:100%;border-collapse:collapse;}
+.p-mtbl td{padding:5px 2px;vertical-align:middle;}
+.p-mimg{max-height:50px;max-width:65px;object-fit:contain;border:1px solid #cbd5e0;border-radius:4px;padding:1px;}
+.p-spgrid{display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;text-align:center;margin-top:4px;}
+.p-spcard{border:1px dashed #a0aec0;padding:6px;border-radius:6px;}
+.p-spimg{height:65px;max-width:100%;object-fit:contain;margin-bottom:4px;}
+.p-spline{font-size:14px;font-weight:800;letter-spacing:3px;border-bottom:1.5px solid #000;display:inline-block;padding:0 6px;}
+
+.p-mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:5px 0 5px 20px;}
+.p-box{display:inline-block;width:15px;height:15px;border:1.2px solid var(--pc);border-radius:3px;margin-left:4px;vertical-align:middle;}
+.p-ln{width:100%;border-bottom:1px solid #718096;height:20px;margin-top:4px;}
+
+.p-footer-nav{
+  margin-top:14px;padding-top:6px;border-top:1.5px solid var(--pc);
+  display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#555;
+  page-break-inside:avoid;
+}
+
+/* Print Rules */
+@media print{
+  html,body{background:#fff!important;padding:0!important;margin:0!important;}
+  .app-header,.sidebar,.drawer-overlay,.noprint,.app-container > div:not(#screen-preview){display:none !important;}
+  #screen-preview{display:block !important;padding:0!important;margin:0!important;}
+  #paper-wrap{padding:0!important;background:#fff!important;}
+  #paper{box-shadow:none!important;margin:0 auto!important;padding:5mm 8mm!important;width:100%!important;max-width:none!important;}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  @page{size:A4;margin:6mm 6mm;}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Drawer Overlay -->
+<div class="drawer-overlay" id="drawer_overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar Drawer Navigation (Screenshot 1) -->
+<aside class="sidebar" id="sidebar_drawer">
+  <div>
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">QP</div>
+      <div>
+        <div class="sidebar-title">Question Paper</div>
+        <div class="sidebar-subtitle">Studio Pro</div>
+      </div>
+    </div>
+
+    <!-- Nav Items -->
+    <div class="sidebar-section-label">WORKSPACE</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" onclick="navigate('screen-dash')">
+        <span class="icon">▦</span>
+        <span>Dashboard</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-edit')">
+        <span class="icon">✏️</span>
+        <span>Create Paper</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-preview')">
+        <span class="icon">👁️</span>
+        <span>Live Sheet Preview</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-lib')">
+        <span class="icon">📄</span>
+        <span>My Papers</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-themes')">
+        <span class="icon">▨</span>
+        <span>Templates & Themes</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-backup')">
+        <span class="icon">⇅</span>
+        <span>Backup & Restore</span>
+      </button>
+      <button class="sidebar-item" onclick="navigate('screen-settings')">
+        <span class="icon">⚙️</span>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer">
+    Question Paper Studio Pro<br>
+    Local-first • Mobile friendly
+  </div>
+</aside>
+
+<!-- Top Navigation Header (Screenshot 2) -->
+<header class="app-header noprint">
+  <div class="header-left">
+    <button class="menu-btn" onclick="openSidebar()" aria-label="Open Menu">☰</button>
+    <div class="page-title">
+      <h1 id="header_title">Dashboard</h1>
+      <p id="header_subtitle">Plan, create and manage school question papers</p>
+    </div>
+  </div>
+  <div class="avatar-badge">QP</div>
+</header>
+
+<main class="app-container">
+
+  <!-- ================= SCREEN 1: DASHBOARD (Screenshots 2 & 3) ================= -->
+  <section id="screen-dash" class="screen active noprint">
+    
+    <!-- Hero / Greeting -->
+    <div class="dash-hero">
+      <h2>Good day, Teacher 👋</h2>
+      <p>Your question paper workspace at a glance.</p>
+      <div class="dash-hero-actions">
+        <button class="btn-soft-blue" onclick="navigate('screen-lib')">View all papers</button>
+        <button class="btn-solid-blue" onclick="navigate('screen-edit')">+ Create new paper</button>
+      </div>
+    </div>
+
+    <!-- 4 Metrics Cards -->
+    <div class="stats-grid">
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-label">Saved Papers</span>
+          <div class="metric-icon">📄</div>
+        </div>
+        <div class="metric-val" id="metric_saved_count">0</div>
+        <div class="metric-sub">Stored in this browser</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-label">Draft Questions</span>
+          <div class="metric-icon">✏️</div>
+        </div>
+        <div class="metric-val" id="metric_draft_count">0</div>
+        <div class="metric-sub">In current editor</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-label">Templates</span>
+          <div class="metric-icon">▨</div>
+        </div>
+        <div class="metric-val">6</div>
+        <div class="metric-sub">Ready-to-use styles</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span class="metric-label">Backup Status</span>
+          <div class="metric-icon">⇅</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:#0f172a;margin-top:4px;" id="metric_backup_status">Not exported</div>
+        <div class="metric-sub">Export a JSON backup anytime</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions (Screenshot 3) -->
+    <div class="section-card">
+      <div class="section-card-title">Quick Actions</div>
+      <div class="section-card-sub">Jump straight to your next task.</div>
+
+      <div class="quick-action-item" onclick="navigate('screen-edit')">
+        <div class="quick-action-icon">✏️</div>
+        <div>
+          <div class="quick-action-title">Create Question Paper</div>
+          <div class="quick-action-sub">Start a new exam paper</div>
+        </div>
+      </div>
+
+      <div class="quick-action-item" onclick="navigate('screen-lib')">
+        <div class="quick-action-icon">📄</div>
+        <div>
+          <div class="quick-action-title">Open My Papers</div>
+          <div class="quick-action-sub">Load or edit saved papers</div>
+        </div>
+      </div>
+
+      <div class="quick-action-item" onclick="navigate('screen-themes')">
+        <div class="quick-action-icon">▨</div>
+        <div>
+          <div class="quick-action-title">Choose a Theme</div>
+          <div class="quick-action-sub">Apply a paper style</div>
+        </div>
+      </div>
+
+      <div class="quick-action-item" onclick="navigate('screen-backup')">
+        <div class="quick-action-icon">⇅</div>
+        <div>
+          <div class="quick-action-title">Backup Data</div>
+          <div class="quick-action-sub">Download or restore JSON</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recently Saved Papers (Screenshot 3) -->
+    <div class="section-card">
+      <div class="section-card-title">Recently Saved Papers</div>
+      <div class="section-card-sub">Your latest work appears here.</div>
+      <div id="recent_papers_container">
+        <!-- Rendered by JS: either empty box or latest 3 papers -->
+      </div>
+    </div>
+
+    <!-- Getting Started (Screenshot 3) -->
+    <div class="section-card">
+      <div class="section-card-title">Getting started</div>
+      <div class="section-card-sub">A simple workflow for building your first paper.</div>
+      <div class="step-grid">
+        <div class="step-item">
+          <div class="step-num">01 • Enter details</div>
+          <div class="step-title">School & Exam Setup</div>
+          <div class="step-desc">Enter school, class, section, subject, date and full marks.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">02 • Add questions</div>
+          <div class="step-title">Visual or Text Questions</div>
+          <div class="step-desc">Pick MCQ, Matching, Fill blanks, or create custom categories.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">03 • Preview & print</div>
+          <div class="step-title">Print or Save as PDF</div>
+          <div class="step-desc">Check the A4 layout with margins, then print or save as PDF.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= SCREEN 2: CREATE / EDIT PAPER ================= -->
+  <section id="screen-edit" class="screen noprint">
+    <div class="section-card">
+      <div class="section-card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🏫 School & Exam Details</span>
+        <button class="btn btn-save" onclick="saveToLibrary()">💾 App Me Save</button>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label>School Ka Naam</label>
+          <input type="text" id="sch_name" value="AL SUFIAAN ENGLISH ACADEMY" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>Exam Ka Naam</label>
+          <input type="text" id="exam_name" value="SECOND TERMINAL EXAMINATION 2026 - 2027" oninput="renderPaper()">
+        </div>
+      </div>
+
+      <div class="row-4" style="margin-top:4px;">
+        <div>
+          <label>Class</label>
+          <input type="text" id="sch_class" value="L.K.G" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>Section (Khali to blank)</label>
+          <input type="text" id="sch_sec" value="A & B" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>Subject</label>
+          <input type="text" id="sch_sub" value="ENGLISH & EVS" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>Full Marks (F.M.)</label>
+          <input type="text" id="sch_fm" value="50" oninput="renderPaper()">
+        </div>
+      </div>
+
+      <div class="row-3" style="margin-top:4px;">
+        <div>
+          <label>Exam Time</label>
+          <input type="text" id="sch_time" value="2 Hours" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>Exam Date (Khali to blank)</label>
+          <input type="text" id="sch_date" value="" placeholder="e.g. 26/10/2026" oninput="renderPaper()">
+        </div>
+        <div>
+          <label>School Logo</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <img id="logo_preview" class="thumb" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><text y='25' font-size='10' text-anchor='middle' x='20'>Logo</text></svg>">
+            <label class="btn btn-primary img-btn">
+              Choose
+              <input type="file" accept="image/*" onchange="uploadLogo(event)">
+            </label>
+            <button class="btn btn-danger" onclick="removeLogo()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:4px;">
+        <label>General Instructions (Nirdesh)</label>
+        <input type="text" id="sch_inst" value="All questions are compulsory. Write neatly and cleanly." oninput="renderPaper()">
+      </div>
+    </div>
+
+    <!-- Paper Mode Switch -->
+    <div class="section-card" style="border:1.5px solid var(--pc);">
+      <div class="section-card-title">Paper Mode Chunein</div>
+      <div class="row-2" style="margin-top:8px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;">
+          <input type="radio" name="paper_mode" value="lower" checked onchange="changePaperMode('lower')">
+          🧸 Lower Class (Nursery – 2)
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;">
+          <input type="radio" name="paper_mode" value="upper" onchange="changePaperMode('upper')">
+          📚 Upper Class (Class 3 – 10)
+        </label>
+      </div>
+    </div>
+
+    <!-- Add Question Tools -->
+    <div class="section-card">
+      <div class="section-card-title">Sawal Jodein / Category Banayein</div>
+      
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;">
+        <button class="btn btn-primary" onclick="addQuestion('match')">↔️ Match The Following</button>
+        <button class="btn btn-primary" onclick="addQuestion('mcq')">☑️ MCQ (Options)</button>
+        <button class="btn btn-primary" onclick="addQuestion('fill')">✏️ Fill in Blanks</button>
+        <button class="btn btn-primary" onclick="addQuestion('tf')">✔️ True / False</button>
+        <button class="btn btn-primary" onclick="addQuestion('pic_spell')">🔤 Look & Write (M _ _ N)</button>
+        <button class="btn btn-primary" onclick="addQuestion('near_far')">👉 Near & Far (This / That)</button>
+        <button class="btn btn-primary" onclick="addQuestion('text_simple')">📝 Q&A / Lines</button>
+      </div>
+
+      <!-- Custom Category Maker -->
+      <div style="background:#f8fafc;padding:10px;border-radius:8px;border:1px solid var(--bd);">
+        <label style="margin:0 0 4px;font-weight:700;color:var(--pc);">+ Custom Question Category Banayein:</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <input type="text" id="custom_cat_title" placeholder="Heading (e.g. Write Rhymes / Opposites :)" style="flex:2;min-width:180px;">
+          <select id="custom_cat_type" style="flex:1;min-width:140px;">
+            <option value="text_simple">Text Based (Sawal + Line)</option>
+            <option value="match">Match The Following</option>
+            <option value="mcq">Options / Tick Box</option>
+            <option value="fill">Fill in Blanks (Underscores)</option>
+            <option value="tf">Right / Wrong (True-False Box)</option>
+            <option value="pic_spell">Picture Grid + Answer Box</option>
+          </select>
+          <button class="btn btn-save" onclick="addCustomCategory()">+ Category Add Karein</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Cards List -->
+    <div id="questions-list"></div>
+  </section>
+
+  <!-- ================= SCREEN 3: LIVE A4 SHEET PREVIEW ================= -->
+  <section id="screen-preview" class="screen">
+    <div class="noprint" style="background:#fff;padding:10px 14px;border-radius:10px;border:1px solid var(--bd);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <span style="font-weight:700;font-size:13px;">A4 Printable Sheet</span>
+        <div style="font-size:11px;color:var(--muted);">Margins are calibrated to prevent clipping.</div>
+      </div>
+      <button class="btn-solid-blue" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+
+    <div id="paper-wrap">
+      <div id="paper">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 4: MY PAPERS (LIBRARY) ================= -->
+  <section id="screen-lib" class="screen noprint">
+    <div class="section-card">
+      <div class="section-card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>📁 School-Wise Saved Papers</span>
+        <button class="btn btn-primary" onclick="renderLibrary()">🔄 Refresh</button>
+      </div>
+      <div class="section-card-sub">Saved papers stored locally in this browser.</div>
+      <div id="library-folders"></div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 5: TEMPLATES & THEMES ================= -->
+  <section id="screen-themes" class="screen noprint">
+    <div class="section-card">
+      <div class="section-card-title">Choose Color Theme & Style</div>
+      <div class="section-card-sub">Select the primary color for the header and question borders.</div>
+
+      <div style="max-width:320px;">
+        <label>Active Theme</label>
+        <select id="theme_picker" onchange="applyTheme()">
+          <option value="navy">Navy Blue (Standard)</option>
+          <option value="maroon">Maroon Red</option>
+          <option value="green">Forest Green</option>
+          <option value="purple">Royal Purple</option>
+          <option value="teal">Dark Teal</option>
+          <option value="bw">Classic Black & White</option>
+        </select>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button class="btn-solid-blue" onclick="navigate('screen-preview')">👁️ Live Preview Dekhein</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 6: BACKUP & RESTORE ================= -->
+  <section id="screen-backup" class="screen noprint">
+    <div class="section-card">
+      <div class="section-card-title">Backup & Restore</div>
+      <div class="section-card-sub">Export your papers as JSON or restore an existing backup.</div>
+
+      <div class="row-2">
+        <div style="background:#f8fafc;padding:14px;border-radius:10px;border:1px solid var(--bd);">
+          <h3 style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:6px;">📤 Export JSON Backup</h3>
+          <p style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Download all saved school records as a single file.</p>
+          <button class="btn-solid-blue" onclick="exportBackup()">📥 Download Backup</button>
+        </div>
+
+        <div style="background:#f8fafc;padding:14px;border-radius:10px;border:1px solid var(--bd);">
+          <h3 style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:6px;">📥 Restore JSON Backup</h3>
+          <p style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Import a previously saved JSON backup file.</p>
+          <label class="btn-soft-blue img-btn">
+            📂 Choose File
+            <input type="file" id="backup_file_input" accept=".json" onchange="importBackup(event)">
+          </label>
+        </div>
+      </div>
+      <div id="backup-status" style="margin-top:12px;font-size:12px;font-weight:600;"></div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 7: SETTINGS ================= -->
+  <section id="screen-settings" class="screen noprint">
+    <div class="section-card">
+      <div class="section-card-title">App Settings & Info</div>
+      <div class="section-card-sub">Application status and storage details.</div>
+      <p style="font-size:13px;line-height:1.6;color:#334155;">
+        <b>Application:</b> Question Paper Studio Pro<br>
+        <b>Storage Mode:</b> LocalStorage (Offline Safe)<br>
+        <b>Storage Key:</b> <code>my_school_papers_db</code><br>
+        <b>Version:</b> 2.6 Mobile-First
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+var STORAGE_KEY = "my_school_papers_db";
+
+var THEMES = {
+  navy:   { pc: "#1e40af", pl: "#eff6ff" },
+  maroon: { pc: "#7f1d1d", pl: "#fdf2f2" },
+  green:  { pc: "#14532d", pl: "#f0fdf4" },
+  purple: { pc: "#581c87", pl: "#faf5ff" },
+  teal:   { pc: "#115e59", pl: "#f0fdfa" },
+  bw:     { pc: "#1a202c", pl: "#f7fafc" }
+};
+
+var currentMode = 'lower';
+var schoolLogo = '';
+
+var lowerQuestions = [
+  {
+    id: "lq_1", type: "match", matchMode: "text",
+    title: "Match the following (Text to Text) :", marks: "4",
+    text: "Cat | Kitten\nDog | Puppy\nCow | Calf\nLion | Cub",
+    items: []
+  },
+  {
+    id: "lq_2", type: "pic_spell",
+    title: "Look at the picture and complete the missing letters :", marks: "3",
+    items: [
+      { pattern: "M _ _ N", img: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=100&q=80" },
+      { pattern: "A _ P _ E", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=100&q=80" }
+    ]
+  }
+];
+
+var upperQuestions = [
+  {
+    id: "uq_1", type: "mcq",
+    title: "Tick (✓) the correct option :", marks: "4",
+    text: "Plants absorb water from | Roots | Leaves | Stem\nWhich animal is called ship of desert? | Camel | Horse | Elephant"
+  },
+  {
+    id: "uq_2", type: "fill",
+    title: "Fill in the blanks with suitable words :", marks: "3",
+    text: "Water freezes into ice at ___ degree celsius.\nThe earth completes one rotation in ___ hours."
+  }
+];
+
+function getCurrentQList(){
+  return (currentMode === 'lower') ? lowerQuestions : upperQuestions;
+}
+
+// Sidebar Drawer Control
+function openSidebar(){
+  document.getElementById('sidebar_drawer').classList.add('open');
+  document.getElementById('drawer_overlay').classList.add('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar_drawer').classList.remove('open');
+  document.getElementById('drawer_overlay').classList.remove('open');
+}
+
+// Navigation Handler
+function navigate(screenId){
+  closeSidebar();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+
+  var screenEl = document.getElementById(screenId);
+  if(screenEl) screenEl.classList.add('active');
+
+  var btn = Array.from(document.querySelectorAll('.sidebar-item')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(screenId));
+  if(btn) btn.classList.add('active');
+
+  // Update Header Titles
+  var titles = {
+    'screen-dash': { t: "Dashboard", st: "Plan, create and manage school question papers" },
+    'screen-edit': { t: "Question Paper Editor", st: "Build your exam questions and metadata" },
+    'screen-preview': { t: "Live A4 Preview", st: "Print-ready layout and page proof" },
+    'screen-lib': { t: "My Papers", st: "Manage saved school question papers" },
+    'screen-themes': { t: "Templates & Themes", st: "Color styles and formatting options" },
+    'screen-backup': { t: "Backup & Restore", st: "Import and export your database" },
+    'screen-settings': { t: "Settings", st: "System storage and preferences" }
+  };
+  if(titles[screenId]){
+    document.getElementById('header_title').innerText = titles[screenId].t;
+    document.getElementById('header_subtitle').innerText = titles[screenId].st;
+  }
+
+  if(screenId === 'screen-dash') updateDashboard();
+  if(screenId === 'screen-preview') renderPaper();
+  if(screenId === 'screen-lib') renderLibrary();
+}
+
+function updateDashboard(){
+  var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var schools = Object.keys(saved);
+  var totalPapers = 0;
+  var allPapers = [];
+
+  schools.forEach(s => {
+    totalPapers += saved[s].length;
+    saved[s].forEach(p => allPapers.push({ school: s, paper: p }));
+  });
+
+  document.getElementById('metric_saved_count').innerText = totalPapers;
+  document.getElementById('metric_draft_count').innerText = getCurrentQList().length;
+
+  var lastExport = localStorage.getItem('last_backup_export_time');
+  if(lastExport){
+    document.getElementById('metric_backup_status').innerText = "Exported " + lastExport;
+  } else {
+    document.getElementById('metric_backup_status').innerText = "Not exported";
+  }
+
+  // Render Recent Papers Card (Screenshot 3)
+  var recentBox = document.getElementById('recent_papers_container');
+  if(allPapers.length === 0){
+    recentBox.innerHTML = `
+      <div class="empty-box">
+        <div class="empty-icon">📄</div>
+        <div class="empty-title">No papers saved yet.</div>
+        <div class="empty-sub">Create your first paper to see it here.</div>
+        <button class="btn-soft-blue" onclick="navigate('screen-lib')">Go to My Papers →</button>
+      </div>
+    `;
+  } else {
+    var h = '';
+    allPapers.slice(0, 3).forEach(item => {
+      var p = item.paper;
+      h += `
+        <div class="quick-action-item" onclick="navigate('screen-lib')">
+          <div class="quick-action-icon">📄</div>
+          <div>
+            <div class="quick-action-title">${esc(p.meta.sch)} - Class ${esc(p.meta.cls)} (${esc(p.meta.sub)})</div>
+            <div class="quick-action-sub">${esc(p.meta.exam)} • ${p.date}</div>
+          </div>
+        </div>
+      `;
+    });
+    recentBox.innerHTML = h;
+  }
+}
+
+function changePaperMode(mode){
+  currentMode = mode;
+  renderEditors();
+  renderPaper();
+  updateDashboard();
+}
+
+function applyTheme(){
+  var key = document.getElementById('theme_picker').value || 'navy';
+  var t = THEMES[key] || THEMES.navy;
+  document.documentElement.style.setProperty('--pc', t.pc);
+  document.documentElement.style.setProperty('--pl', t.pl);
+  renderPaper();
+}
+
+function uploadLogo(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(evt){
+    schoolLogo = evt.target.result;
+    document.getElementById('logo_preview').src = schoolLogo;
+    renderPaper();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo(){
+  schoolLogo = '';
+  document.getElementById('logo_preview').src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><text y='25' font-size='10' text-anchor='middle' x='20'>Logo</text></svg>";
+  renderPaper();
+}
+
+function addCustomCategory(){
+  var title = document.getElementById('custom_cat_title').value.trim();
+  var type = document.getElementById('custom_cat_type').value;
+  if(!title){
+    alert('Kripya naye category ka naam/heading likhein!');
+    return;
+  }
+  var list = getCurrentQList();
+  var id = 'q_' + Date.now();
+
+  if(type === 'match'){
+    list.push({
+      id: id, type: 'match', matchMode: 'text',
+      title: title, marks: '',
+      text: 'Item A | Partner 1\nItem B | Partner 2',
+      items: [{ text: 'Item 1', img: '' }, { text: 'Item 2', img: '' }]
+    });
+  } else if(type === 'mcq'){
+    list.push({
+      id: id, type: 'mcq',
+      title: title, marks: '',
+      text: 'Sawal yahan likhein | Option 1 | Option 2 | Option 3'
+    });
+  } else if(type === 'fill'){
+    list.push({
+      id: id, type: 'fill',
+      title: title, marks: '',
+      text: 'Yeh ek khali jagah hai ___.\nDusra sawal ___ yahan.'
+    });
+  } else if(type === 'tf'){
+    list.push({
+      id: id, type: 'tf',
+      title: title, marks: '',
+      text: 'Statement 1 sahi ya galat.\nStatement 2 sahi ya galat.'
+    });
+  } else if(type === 'pic_spell'){
+    list.push({
+      id: id, type: 'pic_spell',
+      title: title, marks: '',
+      items: [{ pattern: 'W _ R D', img: '' }, { pattern: 'B _ O K', img: '' }]
+    });
+  } else {
+    list.push({
+      id: id, type: 'text_simple',
+      title: title, marks: '',
+      text: 'Sawal number 1\nSawal number 2'
+    });
+  }
+
+  document.getElementById('custom_cat_title').value = '';
+  renderEditors();
+  renderPaper();
+}
+
+function addQuestion(type){
+  var list = getCurrentQList();
+  var id = 'q_' + Date.now();
+
+  if(type === 'match'){
+    list.push({
+      id: id, type: type, matchMode: 'text',
+      title: 'Match the following :', marks: '4',
+      text: 'A | 1\nB | 2\nC | 3',
+      items: [{ text: 'Apple', img: '' }, { text: 'Ball', img: '' }]
+    });
+  } else if(type === 'pic_spell'){
+    list.push({
+      id: id, type: type,
+      title: 'Look at the picture and fill in the missing letters :', marks: '3',
+      items: [{ pattern: 'M _ _ N', img: '' }, { pattern: 'A _ P _ E', img: '' }]
+    });
+  } else if(type === 'near_far'){
+    list.push({
+      id: id, type: type,
+      title: "Fill in the blanks with 'This' or 'That' :", marks: '2',
+      items: [
+        { hint: 'Near', itemText: 'is an apple.', img: '' },
+        { hint: 'Far', itemText: 'is a kite.', img: '' }
+      ]
+    });
+  } else if(type === 'mcq'){
+    list.push({
+      id: id, type: type,
+      title: 'Tick (✓) the correct option :', marks: '4',
+      text: 'National animal of India | Tiger | Lion | Elephant\nDays in a week | 7 | 5 | 8'
+    });
+  } else if(type === 'fill'){
+    list.push({
+      id: id, type: type,
+      title: 'Fill in the blanks with suitable words :', marks: '3',
+      text: 'The color of sky is ___.\nFish live in ___.'
+    });
+  } else if(type === 'tf'){
+    list.push({
+      id: id, type: type,
+      title: 'Write True or False in the given boxes :', marks: '2',
+      text: 'The sun gives us light.\nBirds cannot fly.'
+    });
+  } else {
+    list.push({
+      id: id, type: 'text_simple',
+      title: 'Answer the following questions :', marks: '4',
+      text: 'What is your name?\nWhere do you live?'
+    });
+  }
+
+  renderEditors();
+  renderPaper();
+}
+
+function renderEditors(){
+  var list = getCurrentQList();
+  var h = '';
+
+  list.forEach(function(q, qIdx){
+    h += '<div class="q-card">';
+    h += '<div class="row-2">';
+    h += '<div><label>Question Heading</label><input type="text" value="'+esc(q.title)+'" oninput="updateQProp('+qIdx+', \'title\', this.value)"></div>';
+    h += '<div><label>Marks (0 ya khali to gayab)</label><input type="text" placeholder="e.g. 5 ya 0" value="'+esc(q.marks)+'" oninput="updateQProp('+qIdx+', \'marks\', this.value)"></div>';
+    h += '</div>';
+
+    if(q.type === 'match'){
+      h += '<div style="margin:8px 0;background:#f1f5f9;padding:6px 10px;border-radius:6px;display:flex;align-items:center;gap:12px;">';
+      h += '<span style="font-weight:700;font-size:12px;">Match Type:</span>';
+      h += '<label style="margin:0;cursor:pointer;"><input type="radio" name="mmode_'+q.id+'" value="text" '+(q.matchMode!=='pic'?'checked':'')+' onchange="updateQProp('+qIdx+', \'matchMode\', \'text\'); renderEditors();"> 📝 Text to Text</label>';
+      h += '<label style="margin:0;cursor:pointer;"><input type="radio" name="mmode_'+q.id+'" value="pic" '+(q.matchMode==='pic'?'checked':'')+' onchange="updateQProp('+qIdx+', \'matchMode\', \'pic\'); renderEditors();"> 🖼️ Text to Picture</label>';
+      h += '</div>';
+
+      if(q.matchMode === 'pic'){
+        h += '<div class="sub-items">';
+        h += '<div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">Items & Photos:</div>';
+        if(!q.items) q.items = [];
+        q.items.forEach(function(it, iIdx){
+          h += '<div class="sub-row">';
+          h += '<span style="font-weight:700;">'+(iIdx+1)+'.</span>';
+          h += '<input type="text" placeholder="Word (e.g. Moon)" value="'+esc(it.text)+'" oninput="updateSubItem('+qIdx+', '+iIdx+', \'text\', this.value)">';
+          h += '<img class="thumb" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'><text y=\'16\' font-size=\'10\'>No Pic</text></svg>')+'">';
+          h += '<label class="btn btn-primary img-btn">Photo<input type="file" accept="image/*" onchange="uploadSubImg(event, '+qIdx+', '+iIdx+')"></label>';
+          h += '<button class="btn btn-danger" onclick="delSubItem('+qIdx+', '+iIdx+')">✕</button>';
+          h += '</div>';
+        });
+        h += '<button class="btn btn-primary" onclick="addSubItem('+qIdx+', {text:\'\', img:\'\'})">+ Ek aur Match Item Jodo</button>';
+        h += '</div>';
+      }
+    }
+
+    if(q.type === 'pic_spell'){
+      h += '<div class="sub-items">';
+      h += '<div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">Items & Photos:</div>';
+      q.items.forEach(function(it, iIdx){
+        h += '<div class="sub-row">';
+        h += '<span style="font-weight:700;">'+(iIdx+1)+'.</span>';
+        h += '<input type="text" placeholder="Spelling (e.g. M _ _ N)" value="'+esc(it.pattern)+'" oninput="updateSubItem('+qIdx+', '+iIdx+', \'pattern\', this.value)">';
+        h += '<img class="thumb" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'><text y=\'16\' font-size=\'10\'>No Pic</text></svg>')+'">';
+        h += '<label class="btn btn-primary img-btn">Photo<input type="file" accept="image/*" onchange="uploadSubImg(event, '+qIdx+', '+iIdx+')"></label>';
+        h += '<button class="btn btn-danger" onclick="delSubItem('+qIdx+', '+iIdx+')">✕</button>';
+        h += '</div>';
+      });
+      h += '<button class="btn btn-primary" onclick="addSubItem('+qIdx+', {pattern:\'\', img:\'\'})">+ Ek aur Word Jodo</button>';
+      h += '</div>';
+    }
+
+    if(q.type === 'near_far'){
+      h += '<div class="sub-items">';
+      q.items.forEach(function(it, iIdx){
+        h += '<div class="sub-row">';
+        h += '<select style="width:90px;" onchange="updateSubItem('+qIdx+', '+iIdx+', \'hint\', this.value)"><option value="Near" '+(it.hint==='Near'?'selected':'')+'>Near (This)</option><option value="Far" '+(it.hint==='Far'?'selected':'')+'>Far (That)</option></select>';
+        h += '<input type="text" placeholder="Sentence (e.g. is a ball.)" value="'+esc(it.itemText)+'" oninput="updateSubItem('+qIdx+', '+iIdx+', \'itemText\', this.value)">';
+        h += '<img class="thumb" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'><text y=\'16\' font-size=\'10\'>No Pic</text></svg>')+'">';
+        h += '<label class="btn btn-primary img-btn">Photo<input type="file" accept="image/*" onchange="uploadSubImg(event, '+qIdx+', '+iIdx+')"></label>';
+        h += '<button class="btn btn-danger" onclick="delSubItem('+qIdx+', '+iIdx+')">✕</button>';
+        h += '</div>';
+      });
+      h += '<button class="btn btn-primary" onclick="addSubItem('+qIdx+', {hint:\'Near\', itemText:\'\', img:\'\'})">+ Ek aur Sentence Jodo</button>';
+      h += '</div>';
+    }
+
+    if(q.text !== undefined && (q.type !== 'match' || q.matchMode !== 'pic')){
+      h += '<label>Sawalon ki list (Har line mein ek sawal likhein):</label>';
+      h += '<textarea oninput="updateQProp('+qIdx+', \'text\', this.value)">'+esc(q.text)+'</textarea>';
+    }
+
+    h += '<div class="q-foot">';
+    h += '<div style="display:flex;gap:6px;">';
+    h += '<button class="btn btn-outline" onclick="moveQ('+qIdx+', -1)">↑ Upar</button>';
+    h += '<button class="btn btn-outline" onclick="moveQ('+qIdx+', 1)">↓ Neeche</button>';
+    h += '</div>';
+    h += '<button class="btn btn-danger" onclick="deleteQ('+qIdx+')">Hatao</button>';
+    h += '</div>';
+
+    h += '</div>';
+  });
+
+  document.getElementById('questions-list').innerHTML = h || '<p style="padding:15px;color:#718096;text-align:center;">Abhi koi sawal nahi hai. Upar button se sawal jodein.</p>';
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function updateQProp(qIdx, prop, val){ getCurrentQList()[qIdx][prop] = val; renderPaper(); }
+function updateSubItem(qIdx, sIdx, prop, val){ getCurrentQList()[qIdx].items[sIdx][prop] = val; renderPaper(); }
+function addSubItem(qIdx, obj){ getCurrentQList()[qIdx].items.push(obj); renderEditors(); renderPaper(); }
+function delSubItem(qIdx, sIdx){ getCurrentQList()[qIdx].items.splice(sIdx, 1); renderEditors(); renderPaper(); }
+function deleteQ(qIdx){ getCurrentQList().splice(qIdx, 1); renderEditors(); renderPaper(); }
+function moveQ(qIdx, dir){
+  var list = getCurrentQList();
+  var target = qIdx + dir;
+  if(target < 0 || target >= list.length) return;
+  var temp = list[qIdx];
+  list[qIdx] = list[target];
+  list[target] = temp;
+  renderEditors();
+  renderPaper();
+}
+function uploadSubImg(e, qIdx, sIdx){
+  var file = e.target.files[0];
+  if(!file) return;
+  var r = new FileReader();
+  r.onload = function(evt){
+    getCurrentQList()[qIdx].items[sIdx].img = evt.target.result;
+    renderEditors();
+    renderPaper();
+  };
+  r.readAsDataURL(file);
+}
+
+// Render Paper Preview (A4 Sheet)
+function renderPaper(){
+  var sch = document.getElementById('sch_name').value.trim() || 'AL SUFIAAN ENGLISH ACADEMY';
+  var exam = document.getElementById('exam_name').value.trim() || 'EXAMINATION 2026-27';
+  var cls = document.getElementById('sch_class').value.trim();
+  var sec = document.getElementById('sch_sec').value.trim();
+  var sub = document.getElementById('sch_sub').value.trim();
+  var fm = document.getElementById('sch_fm').value.trim();
+  var dt = document.getElementById('sch_date').value.trim();
+  var tm = document.getElementById('sch_time').value.trim();
+  var inst = document.getElementById('sch_inst').value.trim();
+
+  var h = '';
+  h += '<div class="p-hd">';
+  h += '<div class="p-hd-top">';
+  if(schoolLogo){
+    h += '<img class="p-logo" src="'+schoolLogo+'">';
+  }
+  h += '<div class="p-titles">';
+  h += '<div class="p-sch">'+esc(sch)+'</div>';
+  h += '<div class="p-exm">'+esc(exam)+'</div>';
+  h += '</div>';
+  h += '</div>';
+  
+  var metaParts = [];
+  if(cls) metaParts.push('<span>CLASS : '+esc(cls)+'</span>');
+  if(sec) metaParts.push('<span>SEC : '+esc(sec)+'</span>');
+  if(sub) metaParts.push('<span>SUBJECT : '+esc(sub)+'</span>');
+  if(fm && fm !== '0') metaParts.push('<span>F.M. : '+esc(fm)+'</span>');
+  if(tm) metaParts.push('<span>TIME : '+esc(tm)+'</span>');
+  if(dt) metaParts.push('<span>DATE : '+esc(dt)+'</span>');
+
+  if(metaParts.length > 0){
+    h += '<div class="p-meta">' + metaParts.join('') + '</div>';
+  }
+
+  if(inst){
+    h += '<div class="p-inst"><b>Note:</b> ' + esc(inst) + '</div>';
+  }
+
+  h += '<div class="p-stu">';
+  h += '<span>Student\'s Name :</span><div class="p-dot"></div>';
+  h += '<span>Roll No. :</span><div class="p-dot" style="max-width:80px;"></div>';
+  h += '</div>';
+  h += '</div>';
+
+  h += '<div id="paper-content">';
+  var list = getCurrentQList();
+
+  list.forEach(function(q, idx){
+    h += '<div class="p-q">';
+    var marksVal = String(q.marks || '').trim();
+    var marksHTML = '';
+    if(marksVal !== '' && marksVal !== '0' && marksVal !== '00' && marksVal !== '-'){
+      marksHTML = '<span class="p-marks-badge">[' + esc(marksVal) + ' Marks]</span>';
+    }
+
+    h += '<div class="p-qh"><span>Q.'+(idx+1)+'. '+esc(q.title)+'</span>' + marksHTML + '</div>';
+    h += '<div class="p-qb">';
+
+    if(q.type === 'match'){
+      if(q.matchMode === 'pic' && q.items && q.items.length > 0){
+        h += '<table class="p-mtbl">';
+        var rev = q.items.slice().reverse();
+        q.items.forEach(function(it, i){
+          var sh = rev[i] || it;
+          h += '<tr>';
+          h += '<td style="width:25px;font-weight:700;">('+(i+1)+')</td>';
+          h += '<td style="font-weight:700;font-size:13px;width:120px;">'+esc(it.text)+'</td>';
+          h += '<td style="width:20px;text-align:center;">●</td>';
+          h += '<td></td>';
+          h += '<td style="width:20px;text-align:center;">●</td>';
+          h += '<td style="width:75px;text-align:right;"><img class="p-mimg" src="'+(sh.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 50 40\'><text y=\'25\' font-size=\'9\'>Pic</text></svg>')+'"></td>';
+          h += '</tr>';
+        });
+        h += '</table>';
+      } else {
+        var lines = (q.text||'').split('\n').filter(Boolean);
+        h += '<table style="width:100%;font-size:12.5px;">';
+        lines.forEach(function(ln, i){
+          var parts = ln.split('|');
+          h += '<tr>';
+          h += '<td style="padding:4px 0;"><b>('+(i+1)+')</b> '+esc((parts[0]||'').trim())+'</td>';
+          h += '<td style="padding:4px 0;text-align:right;">('+String.fromCharCode(97+i)+') '+esc((parts[1]||'').trim())+'</td>';
+          h += '</tr>';
+        });
+        h += '</table>';
+      }
+    }
+    else if(q.type === 'pic_spell'){
+      h += '<div class="p-spgrid">';
+      (q.items||[]).forEach(function(it){
+        h += '<div class="p-spcard">';
+        h += '<img class="p-spimg" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 50 40\'><text y=\'25\' font-size=\'9\'>Pic</text></svg>')+'">';
+        h += '<div><span class="p-spline">'+esc(it.pattern)+'</span></div>';
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+    else if(q.type === 'near_far'){
+      (q.items||[]).forEach(function(it, i){
+        h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;font-weight:600;">';
+        h += '<span>('+(i+1)+')</span>';
+        if(it.hint === 'Near'){
+          h += '<img style="height:36px;width:45px;object-fit:contain;" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><text y=\'25\' font-size=\'9\'>Pic</text></svg>')+'">';
+          h += '<span style="border-bottom:1.2px solid #000;display:inline-block;width:65px;margin:0 4px;"></span>';
+          h += '<span>'+esc(it.itemText)+'</span>';
+          h += '<span style="margin-left:auto;font-size:11px;color:#718096;">(Near)</span>';
+        } else {
+          h += '<span style="border-bottom:1.2px solid #000;display:inline-block;width:65px;margin:0 4px;"></span>';
+          h += '<span>'+esc(it.itemText)+'</span>';
+          h += '<span style="margin-left:auto;">👉</span>';
+          h += '<img style="height:36px;width:45px;object-fit:contain;" src="'+(it.img || 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><text y=\'25\' font-size=\'9\'>Pic</text></svg>')+'">';
+          h += '<span style="font-size:11px;color:#718096;">(Far)</span>';
+        }
+        h += '</div>';
+      });
+    }
+    else if(q.type === 'mcq'){
+      var lines = (q.text||'').split('\n').filter(Boolean);
+      lines.forEach(function(ln, i){
+        var parts = ln.split('|');
+        h += '<div style="margin-bottom:8px;">';
+        h += '<div><b>('+(i+1)+')</b> '+esc(parts[0].trim())+'</div>';
+        h += '<div class="p-mcq-grid">';
+        parts.slice(1).forEach(function(opt, oIdx){
+          var char = ['(a)','(b)','(c)','(d)'][oIdx] || '';
+          h += '<div>'+char+' '+esc(opt.trim())+' <span class="p-box"></span></div>';
+        });
+        h += '</div>';
+        h += '</div>';
+      });
+    }
+    else if(q.type === 'fill'){
+      var lines = (q.text||'').split('\n').filter(Boolean);
+      lines.forEach(function(ln, i){
+        var formatted = esc(ln).replace(/_{2,}/g, '<span style="display:inline-block;width:80px;border-bottom:1.2px solid #000;margin:0 4px;"></span>');
+        h += '<div style="margin-bottom:6px;font-size:13px;"><b>('+(i+1)+')</b> '+formatted+'</div>';
+      });
+    }
+    else if(q.type === 'tf'){
+      var lines = (q.text||'').split('\n').filter(Boolean);
+      lines.forEach(function(ln, i){
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;">';
+        h += '<span><b>('+(i+1)+')</b> '+esc(ln)+'</span>';
+        h += '<span style="width:40px;height:18px;border:1.2px solid var(--pc);border-radius:3px;display:inline-block;"></span>';
+        h += '</div>';
+      });
+    }
+    else {
+      var lines = (q.text||'').split('\n').filter(Boolean);
+      lines.forEach(function(ln, i){
+        h += '<div style="margin-bottom:8px;font-size:13px;">';
+        h += '<div><b>('+(i+1)+')</b> '+esc(ln)+'</div>';
+        h += '<div class="p-ln"></div>';
+        h += '</div>';
+      });
+    }
+
+    h += '</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="p-footer-nav">';
+  h += '<span>✦ ALL THE BEST ✦</span>';
+  h += '<span>Page 1 of 1 • [ P.T.O. ]</span>';
+  h += '</div>';
+
+  document.getElementById('paper').innerHTML = h;
+}
+
+// Save Paper to Library
+function saveToLibrary(){
+  var sch = document.getElementById('sch_name').value.trim() || 'General School';
+  var exam = document.getElementById('exam_name').value.trim();
+  var cls = document.getElementById('sch_class').value.trim();
+  var sec = document.getElementById('sch_sec').value.trim();
+  var sub = document.getElementById('sch_sub').value.trim();
+  var fm = document.getElementById('sch_fm').value.trim();
+  var dt = document.getElementById('sch_date').value.trim();
+  var tm = document.getElementById('sch_time').value.trim();
+  var inst = document.getElementById('sch_inst').value.trim();
+
+  var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  if(!saved[sch]) saved[sch] = [];
+
+  var entry = {
+    id: 'p_' + Date.now(),
+    date: new Date().toLocaleDateString('hi-IN'),
+    time: new Date().toLocaleTimeString('hi-IN', {hour: '2-digit', minute:'2-digit'}),
+    mode: currentMode,
+    meta: { sch: sch, exam: exam, cls: cls, sec: sec, sub: sub, fm: fm, dt: dt, tm: tm, inst: inst },
+    theme: document.getElementById('theme_picker').value,
+    logo: schoolLogo,
+    questions: JSON.parse(JSON.stringify(getCurrentQList()))
+  };
+
+  saved[sch].unshift(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  alert('Paper safalta-purvak "' + sch + '" ke folder me save ho gaya!');
+  renderLibrary();
+  updateDashboard();
+}
+
+function renderLibrary(){
+  var container = document.getElementById('library-folders');
+  var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var schools = Object.keys(saved);
+
+  if(schools.length === 0){
+    container.innerHTML = '<p style="padding:15px;color:#718096;text-align:center;">Abhi koi paper save nahi hai. "Create Paper" mein jaakar save karein.</p>';
+    return;
+  }
+
+  var h = '';
+  schools.forEach(function(schoolName){
+    var list = saved[schoolName];
+    h += '<div class="section-card" style="margin-bottom:12px;">';
+    h += '<div class="section-card-title">🏫 ' + esc(schoolName) + ' (' + list.length + ' Papers)</div>';
+    list.forEach(function(p, idx){
+      var secText = p.meta.sec ? ' (' + p.meta.sec + ')' : '';
+      h += `
+        <div class="quick-action-item" style="margin-top:8px;">
+          <div style="flex:1;">
+            <div class="quick-action-title">Class ${esc(p.meta.cls)}${secText} • ${esc(p.meta.sub)} (${p.mode==='lower'?'🧸 Lower':'📚 Upper'})</div>
+            <div class="quick-action-sub">${esc(p.meta.exam)} • ${p.date} ${p.time}</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary" onclick="loadSavedPaper('${escape(schoolName)}', ${idx})">Kholein</button>
+            <button class="btn btn-danger" onclick="deleteSavedPaper('${escape(schoolName)}', ${idx})">✕</button>
+          </div>
+        </div>
+      `;
+    });
+    h += '</div>';
+  });
+
+  container.innerHTML = h;
+}
+
+function loadSavedPaper(encSchool, idx){
+  var schoolName = unescape(encSchool);
+  var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var p = saved[schoolName][idx];
+  if(!p) return;
+
+  document.getElementById('sch_name').value = p.meta.sch;
+  document.getElementById('exam_name').value = p.meta.exam;
+  document.getElementById('sch_class').value = p.meta.cls;
+  document.getElementById('sch_sec').value = p.meta.sec || '';
+  document.getElementById('sch_sub').value = p.meta.sub;
+  document.getElementById('sch_fm').value = p.meta.fm || '';
+  document.getElementById('sch_date').value = p.meta.dt || '';
+  document.getElementById('sch_time').value = p.meta.tm || '';
+  document.getElementById('sch_inst').value = p.meta.inst || '';
+  document.getElementById('theme_picker').value = p.theme || 'navy';
+  schoolLogo = p.logo || '';
+  if(schoolLogo) document.getElementById('logo_preview').src = schoolLogo;
+  applyTheme();
+
+  currentMode = p.mode || 'lower';
+  document.querySelector('input[name="paper_mode"][value="'+currentMode+'"]').checked = true;
+  changePaperMode(currentMode);
+
+  if(currentMode === 'lower') lowerQuestions = JSON.parse(JSON.stringify(p.questions));
+  else upperQuestions = JSON.parse(JSON.stringify(p.questions));
+
+  renderEditors();
+  navigate('screen-preview');
+  alert('Paper load ho gaya!');
+}
+
+function deleteSavedPaper(encSchool, idx){
+  if(!confirm('Kya aap is paper ko library se delete karna chahte hain?')) return;
+  var schoolName = unescape(encSchool);
+  var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  saved[schoolName].splice(idx, 1);
+  if(saved[schoolName].length === 0) delete saved[schoolName];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  renderLibrary();
+  updateDashboard();
+}
+
+// Backup & Restore
+function exportBackup(customData, customFilename){
+  var dataToExport = customData || JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var backupObj = {
+    appName: "Question Paper Studio Pro",
+    backupVersion: 1,
+    exportedAt: new Date().toISOString(),
+    storageKey: STORAGE_KEY,
+    data: dataToExport
+  };
+
+  var jsonStr = JSON.stringify(backupObj, null, 2);
+  var blob = new Blob([jsonStr], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var dateTag = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = customFilename || ("Paper_Maker_Backup_" + dateTag + ".json");
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  var nowTime = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  localStorage.setItem('last_backup_export_time', nowTime);
+  document.getElementById('backup-status').innerHTML = '<span style="color:var(--success);">✅ Backup JSON safalta-purvak download ho gaya!</span>';
+  updateDashboard();
+}
+
+function importBackup(event){
+  var file = event.target.files[0];
+  if(!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var parsed = JSON.parse(e.target.result);
+      if(!parsed || typeof parsed !== 'object') throw new Error("Invalid file format.");
+
+      var incomingData = parsed.data !== undefined ? parsed.data : parsed;
+      if(typeof incomingData !== 'object' || Array.isArray(incomingData)) throw new Error("Invalid data structure.");
+
+      var currentData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      if(!confirm("Kya aap backup restore karna chahte hain? Purana data replace ho jayega.")) return;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(incomingData));
+      renderLibrary();
+      updateDashboard();
+      document.getElementById('backup-status').innerHTML = '<span style="color:var(--success);">✅ Backup safalta-purvak restore ho gaya!</span>';
+      alert("✅ Data restore ho gaya!");
+    } catch(err){
+      document.getElementById('backup-status').innerHTML = '<span style="color:var(--danger);">❌ Restore error: ' + err.message + '</span>';
+    } finally {
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Initial Boot
+applyTheme();
+renderEditors();
+renderPaper();
+updateDashboard();
+</script>
+</body>
+</html>
+  
